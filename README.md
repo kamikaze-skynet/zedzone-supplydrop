@@ -13,7 +13,7 @@ Loot comes from the game's own supply-crate tables: the first crate is an elite 
 
 Drops only happen when someone is above ground, and not while the game says it's a bad time (in a menu, at base, in a cutscene). The first drop comes 8 minutes after loading in, then about every 20 minutes.
 
-**Testing:** the host can press **F8** to call a drop right away (turn this off with `Keys.AllowCallKey = false`).
+**Testing:** the host can press **End** to call a drop right away (turn this off with `Keys.AllowCallKey = false`).
 
 ## Co-op
 
@@ -40,7 +40,7 @@ The host runs everything: the timer, the crates, the loot and the zombies. Those
 | Zombies.BeaconSeconds | 60 | how long the beacon keeps calling zombies |
 | Helicopter.Enabled / Volume / Speed / Size | true / 0.6 / 14 / 1 | the flyover |
 | UI.GuideArrow / ArrowMinutes | true / 4 | the arrow pointing at the crate |
-| Keys.CallDropKey / AllowCallKey | F8 / true | call a drop now (host) |
+| Keys.CallDropKey / AllowCallKey | End / true | call a drop now (host) |
 
 ## Log
 

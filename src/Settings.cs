@@ -62,7 +62,7 @@ namespace SupplyDrop
             ShareWithGuests = c.Bind("General", "ShareWithGuests", true, "Host: send the drop to guests who have the mod (message, helicopter, arrow).");
 
             AllowCallKey = c.Bind("Keys", "AllowCallKey", true, "Host: let CallDropKey call a drop right now (handy for testing).");
-            CallDropKey = c.Bind("Keys", "CallDropKey", KeyCode.F8, "Host: key that calls a supply drop right now.");
+            CallDropKey = c.Bind("Keys", "CallDropKey", KeyCode.End, "Host: key that calls a supply drop right now. Default End: F5 is the game's quick save, F7/F8 are DogShare's give/take-back dog keys (F9/F10 its kennel test build), Insert is Spawn Menu.");
         }
 
         internal static string Describe() =>

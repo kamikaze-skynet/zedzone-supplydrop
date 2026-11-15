@@ -11,7 +11,7 @@ Every so often a supply helicopter flies over and parachutes a crate of good loo
 [/list]
 
 Loot uses the game's own supply-crate tables (elite box, armoury, personal and flare-gun airdrop loot).
-First drop 8 minutes after loading in, then about every 20 minutes. Host can press F8 to call one right away.
+First drop 8 minutes after loading in, then about every 20 minutes. Host can press End to call one right away.
 
 [h2]Co-op[/h2]
 The host runs the drops; crates, loot and zombies are the game's own and sync to everyone. Guests with the mod also see the helicopter, message and arrow.

@@ -11,7 +11,7 @@ namespace SupplyDrop
     public class Plugin : BasePlugin
     {
         public const string Guid = "girthy_mods.zedzone.supplydrop";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         public override void Load()
         {
@@ -33,6 +33,7 @@ namespace SupplyDrop
             try { new Harmony(Guid).PatchAll(typeof(ChatPatches)); SLog.Info("Co-op messages hooked."); }
             catch (Exception e) { SLog.Error("Hooking co-op chat failed; guests won't see the helicopter or the message", e); }
 
+            KeyCheck.Run();
             SLog.Info($"Supply Drop {Version} loaded.");
         }
     }
