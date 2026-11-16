@@ -1,6 +1,6 @@
 {
     "name": "Supply Drop",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "author": "girthy_mods",
     "description": "A helicopter flies over every so often and parachutes a crate of good loot near a player. The crate's beacon draws a zombie horde to it: grab it fast. Host-side, works in co-op.",
     "enabled": true

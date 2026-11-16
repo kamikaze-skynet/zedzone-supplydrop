@@ -4,13 +4,13 @@ Every so often a supply helicopter flies over and parachutes a crate of good loo
 
 [h2]What happens[/h2]
 [list]
-[*][b]Warning:[/b] "Supply helicopter inbound! Crate drops to the north-east in 45 s." A yellow arrow points at the drop zone.
+[*][b]Warning:[/b] "Supply helicopter inbound! Crate drops to the north-east in 45 s." The drop zone is a random spot, marked on your map, minimap and screen edge as a waypoint (teammates see it too).
 [*][b]Flyover:[/b] a helicopter crosses the map with rotor sound and shadow.
 [*][b]Drop:[/b] the crate comes down on a parachute with a blinking marker. One crate per player in co-op (up to 4).
 [*][b]Horde:[/b] a few seconds after landing the beacon goes off and zombies converge on it. The horde grows with the day count.
 [/list]
 
-Loot uses the game's own supply-crate tables (elite box, armoury, personal and flare-gun airdrop loot).
+Random loot: 5-9 random items per crate from everything that can spawn in the world, always including a gun with ammo. (Or switch to the game's supply-crate tables in the config.)
 First drop 8 minutes after loading in, then about every 20 minutes. Host can press End to call one right away.
 
 [h2]Co-op[/h2]

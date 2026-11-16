@@ -11,7 +11,7 @@ namespace SupplyDrop
     public class Plugin : BasePlugin
     {
         public const string Guid = "girthy_mods.zedzone.supplydrop";
-        public const string Version = "1.0.1";
+        public const string Version = "1.1.0";
 
         public override void Load()
         {
@@ -51,6 +51,8 @@ namespace SupplyDrop
             catch (Exception e) { SLog.Error("Co-op update failed", e); }
             try { Heli.Tick(); }
             catch (Exception e) { SLog.Error("Helicopter update failed", e); Heli.Clear(); }
+            try { Marker.Tick(); }
+            catch (Exception e) { SLog.Error("Map marker update failed", e); }
             try { Arrow.Tick(); }
             catch (Exception e) { SLog.Error("Arrow update failed", e); Arrow.Clear(); }
         }

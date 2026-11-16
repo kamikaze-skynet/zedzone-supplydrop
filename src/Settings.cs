@@ -14,14 +14,16 @@ namespace SupplyDrop
         // loot
         internal static ConfigEntry<int> LootLevel, MaxCrates;
         internal static ConfigEntry<bool> CratePerPlayer;
+        internal static ConfigEntry<string> LootMode;
+        internal static ConfigEntry<int> ItemsMin, ItemsMax;
         internal static ConfigEntry<float> LootQuality;
         // zombies
         internal static ConfigEntry<bool> Zombies, ScaleZombiesByDay;
         internal static ConfigEntry<int> ZombieCount;
         internal static ConfigEntry<float> ZombieDelaySeconds, BeaconSeconds;
         // helicopter / UI
-        internal static ConfigEntry<bool> Helicopter, GuideArrow, ShareWithGuests;
-        internal static ConfigEntry<float> HeliVolume, HeliSpeed, HeliScale, ArrowMinutes;
+        internal static ConfigEntry<bool> Helicopter, GuideArrow, ShareWithGuests, MapMarker;
+        internal static ConfigEntry<float> HeliVolume, HeliSpeed, HeliScale, ArrowMinutes, MarkerMinutes;
         internal static ConfigEntry<KeyCode> CallDropKey;
         internal static ConfigEntry<bool> AllowCallKey;
 
@@ -38,9 +40,12 @@ namespace SupplyDrop
             IntervalRandomMinutes = c.Bind("Timing", "IntervalRandomMinutes", 5f, R("Each wait is IntervalMinutes plus or minus up to this many minutes.", 0f, 120f));
             WarningSeconds = c.Bind("Timing", "WarningSeconds", 45f, R("Seconds between the 'helicopter inbound' message and the crate dropping.", 10f, 300f));
 
-            DropDistanceMin = c.Bind("Drop", "DistanceMin", 18f, R("Closest the crate lands to the chosen player (world units).", 4f, 200f));
-            DropDistanceMax = c.Bind("Drop", "DistanceMax", 32f, R("Farthest the crate lands from the chosen player (world units).", 4f, 300f));
+            DropDistanceMin = c.Bind("Location", "MinDistance", 40f, R("The crate lands at a random spot at least this far (world units) from a random player. It's marked on the map.", 4f, 400f));
+            DropDistanceMax = c.Bind("Location", "MaxDistance", 90f, R("...and at most this far. Very far drops can land in areas nobody has loaded yet.", 4f, 600f));
 
+            LootMode = c.Bind("Loot", "Mode", "Random", new ConfigDescription("Random: each crate gets random items from every item that can spawn in the world (a gun with ammo, plus a mix of ammo, gear, food, materials...). Tables: the game's own supply-crate tables (elite/armoury/personal boxes).", new AcceptableValueList<string>("Random", "Tables")));
+            ItemsMin = c.Bind("Loot", "ItemsMin", 5, RI("Random mode: fewest items in a crate.", 1, 30));
+            ItemsMax = c.Bind("Loot", "ItemsMax", 9, RI("Random mode: most items in a crate.", 1, 30));
             LootLevel = c.Bind("Loot", "LootLevel", 6, RI("How good the loot is (1-15). Uses the game's own supply-crate loot tables; higher means better weapons and more of them.", 1, 15));
             LootQuality = c.Bind("Loot", "AffixIntensity", 0.5f, R("How strong random weapon/armour bonuses on crate loot are (0 = none, 1 = strongest).", 0f, 1f));
             CratePerPlayer = c.Bind("Loot", "CratePerPlayer", true, "Drop one crate per player in the session (so nobody has to fight over it).");
@@ -59,6 +64,8 @@ namespace SupplyDrop
 
             GuideArrow = c.Bind("UI", "GuideArrow", true, "Show an arrow next to your character that points at the newest crate.");
             ArrowMinutes = c.Bind("UI", "ArrowMinutes", 4f, R("How long the arrow stays (it also goes away when you reach the crate).", 0.5f, 30f));
+            MapMarker = c.Bind("UI", "MapMarker", true, "Put the drop on your map as a waypoint (map pin, minimap, edge-of-screen arrow with distance; teammates see it too). Your old waypoint comes back after you reach the crate.");
+            MarkerMinutes = c.Bind("UI", "MarkerMinutes", 10f, R("How long the map marker stays if nobody reaches the crate.", 1f, 60f));
             ShareWithGuests = c.Bind("General", "ShareWithGuests", true, "Host: send the drop to guests who have the mod (message, helicopter, arrow).");
 
             AllowCallKey = c.Bind("Keys", "AllowCallKey", true, "Host: let CallDropKey call a drop right now (handy for testing).");
@@ -67,8 +74,8 @@ namespace SupplyDrop
 
         internal static string Describe() =>
             $"Config: Enabled={Enabled.Value} first={FirstDropMinutes.Value}m every={IntervalMinutes.Value}±{IntervalRandomMinutes.Value}m warning={WarningSeconds.Value}s " +
-            $"distance={DropDistanceMin.Value}-{DropDistanceMax.Value} loot={LootLevel.Value} affix={LootQuality.Value} perPlayer={CratePerPlayer.Value} max={MaxCrates.Value} " +
+            $"distance={DropDistanceMin.Value}-{DropDistanceMax.Value} loot={LootMode.Value} items={ItemsMin.Value}-{ItemsMax.Value} level={LootLevel.Value} affix={LootQuality.Value} perPlayer={CratePerPlayer.Value} max={MaxCrates.Value} " +
             $"zombies={Zombies.Value} x{ZombieCount.Value} scale={ScaleZombiesByDay.Value} delay={ZombieDelaySeconds.Value}s beacon={BeaconSeconds.Value}s " +
-            $"heli={Helicopter.Value} vol={HeliVolume.Value} speed={HeliSpeed.Value} arrow={GuideArrow.Value} key={(AllowCallKey.Value ? CallDropKey.Value.ToString() : "off")}";
+            $"heli={Helicopter.Value} vol={HeliVolume.Value} speed={HeliSpeed.Value} arrow={GuideArrow.Value} map={MapMarker.Value} key={(AllowCallKey.Value ? CallDropKey.Value.ToString() : "off")}";
     }
 }

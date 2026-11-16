@@ -227,6 +227,11 @@ namespace SupplyDrop
 
         static ItemList Loot(int crate)
         {
+            if (!string.Equals(Settings.LootMode.Value, "Tables", StringComparison.OrdinalIgnoreCase))
+            {
+                try { var r = RandomLoot.Make(); if (r != null && r.Count > 0) return r; }
+                catch (Exception e) { SLog.Warn("Random loot failed (" + e.Message + "); using the game's tables."); }
+            }
             int level = Mathf.Clamp(Settings.LootLevel.Value + _rng.Next(-1, 2), 1, 20);
             // first crate: the good one; the rest: a mix
             int kind = crate == 0 ? 0 : _rng.Next(4);
@@ -368,8 +373,9 @@ namespace SupplyDrop
         internal static void ShowInbound(int id, Vector2 target, float heading, float secondsToOverhead, bool local)
         {
             float overheadAt = Time.time + secondsToOverhead;
-            Notify($"Supply helicopter inbound! Crate drops {Where(target)} in {Mathf.RoundToInt(secondsToOverhead)} s. Its beacon will draw zombies.");
+            Notify($"Supply helicopter inbound! Crate drops {Where(target)} in {Mathf.RoundToInt(secondsToOverhead)} s. It's marked on your map. Its beacon will draw zombies.");
             Arrow.Point(target, false);
+            Marker.Set(target, false);
             // appear so it reaches the drop point right on time
             Heli.Spawn(target, heading, overheadAt);
             if (!local) SLog.Info($"Host says: supply drop #{id} inbound at ({target.x:0.#}, {target.y:0.#}).");
@@ -379,6 +385,7 @@ namespace SupplyDrop
         {
             Notify($"Supply crate down {Where(target)}! Grab it before the horde does.");
             Arrow.Point(target, true);
+            Marker.Set(target, true);
         }
 
         static string Where(Vector2 target)
