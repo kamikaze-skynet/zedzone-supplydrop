@@ -90,6 +90,17 @@ $Vdf = Join-Path $Dist "workshop_item.vdf"
 if ($isNew) { Write-Host "==> Creating a new Workshop item ($Visibility)" -ForegroundColor Cyan }
 else        { Write-Host "==> Updating Workshop item $Id" -ForegroundColor Cyan }
 & $SteamCmd +login $SteamUser +workshop_build_item $Vdf +quit
+$steamExit = $LASTEXITCODE
+
+# SteamCMD's exit code is 0 only when login and upload both worked. (An existing item's id is
+# already in the VDF, so the id alone doesn't prove anything.)
+if ($steamExit -ne 0) {
+    Write-Host ""
+    Write-Host " Upload FAILED (SteamCMD exit code $steamExit) - nothing was changed on the Workshop." -ForegroundColor Red
+    Write-Host " 'Access Denied' at login: the saved Steam login expired. Log in once by hand, then rerun with -SkipBuild:" -ForegroundColor Red
+    Write-Host "     & '$SteamCmd' +login $SteamUser +quit" -ForegroundColor Yellow
+    exit 1
+}
 
 # SteamCMD writes the item id back into the VDF after a successful upload.
 $after = Get-Content $Vdf -Raw
