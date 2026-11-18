@@ -11,7 +11,7 @@ namespace SupplyDrop
     public class Plugin : BasePlugin
     {
         public const string Guid = "girthy_mods.zedzone.supplydrop";
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
 
         public override void Load()
         {

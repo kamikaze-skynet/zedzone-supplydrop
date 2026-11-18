@@ -22,7 +22,7 @@ namespace SupplyDrop
         internal static ConfigEntry<int> ZombieCount;
         internal static ConfigEntry<float> ZombieDelaySeconds, BeaconSeconds;
         // helicopter / UI
-        internal static ConfigEntry<bool> Helicopter, GuideArrow, ShareWithGuests, MapMarker;
+        internal static ConfigEntry<bool> Helicopter, UseUH1Y, GuideArrow, ShareWithGuests, MapMarker;
         internal static ConfigEntry<float> HeliVolume, HeliSpeed, HeliScale, ArrowMinutes, MarkerMinutes;
         internal static ConfigEntry<KeyCode> CallDropKey;
         internal static ConfigEntry<bool> AllowCallKey;
@@ -58,6 +58,7 @@ namespace SupplyDrop
             BeaconSeconds = c.Bind("Zombies", "BeaconSeconds", 60f, R("How long the beacon keeps calling zombies.", 5f, 600f));
 
             Helicopter = c.Bind("Helicopter", "Enabled", true, "Show the helicopter flying over and play its rotor sound.");
+            UseUH1Y = c.Bind("Helicopter", "UH1Y", true, "Draw the UH-1Y helicopter (built into this mod; no other mod needed). Off = the simple code-drawn helicopter.");
             HeliVolume = c.Bind("Helicopter", "Volume", 0.6f, R("Rotor sound volume.", 0f, 1f));
             HeliSpeed = c.Bind("Helicopter", "Speed", 14f, R("Flying speed in world units per second.", 2f, 60f));
             HeliScale = c.Bind("Helicopter", "Size", 1f, R("Size of the helicopter sprite.", 0.3f, 4f));

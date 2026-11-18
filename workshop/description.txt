@@ -5,7 +5,7 @@ Every so often a supply helicopter flies over and parachutes a crate of good loo
 [h2]What happens[/h2]
 [list]
 [*][b]Warning:[/b] "Supply helicopter inbound! Crate drops to the north-east in 45 s." The drop zone is a random spot, marked on your map, minimap and screen edge as a waypoint (teammates see it too).
-[*][b]Flyover:[/b] a helicopter crosses the map with rotor sound and shadow.
+[*][b]Flyover:[/b] a UH-1Y helicopter crosses the map with spinning rotors, rotor sound and a shadow.
 [*][b]Drop:[/b] the crate comes down on a parachute with a blinking marker. One crate per player in co-op (up to 4).
 [*][b]Horde:[/b] a few seconds after landing the beacon goes off and zombies converge on it. The horde grows with the day count.
 [/list]
@@ -19,7 +19,8 @@ The host runs the drops; crates, loot and zombies are the game's own and sync to
 Settings: BepInEx\config\girthy_mods.zedzone.supplydrop.cfg
 Log: BepInEx\SupplyDrop.log
 
-Needs BepInEx (IL2CPP).
+[h2]Requires[/h2]
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3834614258]ZED ZONE Code Mod Loader[/url] - run its install.cmd once, then start the game through Steam.
 
 [h2]Settings and keys: Mod Menu[/h2]
 Press [b]F11[/b] in game to open [b]Mod Menu[/b] (Steam installs it with this mod). There you can rebind this mod's keys (call-a-drop key End) and change its settings without editing files.
