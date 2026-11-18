@@ -19,7 +19,8 @@ The host runs the drops; crates, loot and zombies are the game's own and sync to
 Settings: BepInEx\config\girthy_mods.zedzone.supplydrop.cfg
 Log: BepInEx\SupplyDrop.log
 
-Needs BepInEx (IL2CPP).
+[h2]Requires[/h2]
+[url=https://steamcommunity.com/sharedfiles/filedetails/?id=3834614258]ZED ZONE Code Mod Loader[/url] - run its install.cmd once, then start the game through Steam.
 
 [h2]Settings and keys: Mod Menu[/h2]
 Press [b]F11[/b] in game to open [b]Mod Menu[/b] (Steam installs it with this mod). There you can rebind this mod's keys (call-a-drop key End) and change its settings without editing files.
