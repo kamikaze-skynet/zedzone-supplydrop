@@ -14,7 +14,7 @@ namespace SupplyDrop
 
         sealed class Flight
         {
-            internal GameObject Root, Body, Rotor, Tail, ShadowGo;
+            internal GameObject Root, Body, Rotor, Rotor2, Tail, ShadowGo;
             internal AudioSource Audio;
             internal Vector2 Target, Dir;
             internal float OverheadAt, Speed, Scale;
@@ -74,7 +74,8 @@ namespace SupplyDrop
             if (!Settings.Helicopter.Value) return;
             // wait out of sight until it's time to fly in
             if (overheadAt - Time.time > FlyInSeconds + 0.5f) { _pending.Add((target, headingDeg, overheadAt)); return; }
-            var body = Art.Body;
+            bool uh1y = Settings.UseUH1Y.Value && UH1Y.Ready();
+            var body = uh1y ? UH1Y.Body : Art.Body;
             if (body == null) return;
             float rad = headingDeg * Mathf.Deg2Rad;
             var f = new Flight
@@ -88,21 +89,36 @@ namespace SupplyDrop
             try
             {
                 f.Root = new GameObject("SupplyDrop.Helicopter");
-                f.Root.transform.localScale = new Vector3(f.Scale, f.Scale, 1f);
+                float draw = uh1y ? f.Scale * UH1Y.DrawScale : f.Scale;
+                f.Root.transform.localScale = new Vector3(draw, draw, 1f);
                 var bodySr = Part("Body", f.Root.transform, body, 32000, Color.white);
                 f.Body = bodySr.gameObject;
                 f.Body.transform.localRotation = Quaternion.Euler(0, 0, headingDeg);
-                // main rotor sits over the engine (a bit behind the middle of the fuselage)
-                var rotor = Part("Rotor", f.Body.transform, Art.Rotor, 32002, Color.white);
-                f.Rotor = rotor.gameObject;
-                f.Rotor.transform.localPosition = new Vector3((37f - Art.BodyW * 0.62f) / 16f, 0f, 0f);
-                var tail = Part("TailRotor", f.Body.transform, Art.TailRotor, 32001, Color.white);
-                f.Tail = tail.gameObject;
-                f.Tail.transform.localPosition = new Vector3((3f - Art.BodyW * 0.62f) / 16f, 0.25f, 0f);
+                if (uh1y)
+                {
+                    // the render's mast is at its centre; a second, faint copy 45 deg off blurs the spinning blades
+                    var rotor = Part("Rotor", f.Body.transform, UH1Y.Rotor, 32002, new Color(1f, 1f, 1f, 0.55f));
+                    f.Rotor = rotor.gameObject;
+                    var rotor2 = Part("RotorBlur", f.Body.transform, UH1Y.Rotor, 32001, new Color(1f, 1f, 1f, 0.45f));
+                    f.Rotor2 = rotor2.gameObject;
+                    f.Rotor2.transform.localRotation = Quaternion.Euler(0, 0, 45f);
+                }
+                else
+                {
+                    // main rotor sits over the engine (a bit behind the middle of the fuselage)
+                    var rotor = Part("Rotor", f.Body.transform, Art.Rotor, 32002, Color.white);
+                    f.Rotor = rotor.gameObject;
+                    f.Rotor.transform.localPosition = new Vector3((37f - Art.BodyW * 0.62f) / 16f, 0f, 0f);
+                    var tail = Part("TailRotor", f.Body.transform, Art.TailRotor, 32001, Color.white);
+                    f.Tail = tail.gameObject;
+                    f.Tail.transform.localPosition = new Vector3((3f - Art.BodyW * 0.62f) / 16f, 0.25f, 0f);
+                }
 
-                var shadow = Part("SupplyDrop.HeliShadow", null, Art.Shadow, 31990, new Color(0f, 0f, 0f, 0.28f));
+                var shadow = uh1y
+                    ? Part("SupplyDrop.HeliShadow", null, UH1Y.Body, 31990, new Color(0.05f, 0.07f, 0.04f, 0.3f))
+                    : Part("SupplyDrop.HeliShadow", null, Art.Shadow, 31990, new Color(0f, 0f, 0f, 0.28f));
                 f.ShadowGo = shadow.gameObject;
-                f.ShadowGo.transform.localScale = new Vector3(f.Scale * 0.9f, f.Scale * 0.9f, 1f);
+                f.ShadowGo.transform.localScale = new Vector3(draw * 0.9f, draw * 0.9f, 1f);
                 f.ShadowGo.transform.localRotation = Quaternion.Euler(0, 0, headingDeg);
 
                 var clip = RotorSound.Clip();
@@ -155,7 +171,8 @@ namespace SupplyDrop
                 if (gone || InGameController.instance == null) { Destroy(f); _live.RemoveAt(i); continue; }
                 Place(f, now);
                 f.Rotor.transform.Rotate(0f, 0f, -1500f * Time.deltaTime);
-                f.Tail.transform.Rotate(0f, 0f, -2200f * Time.deltaTime);
+                if (f.Rotor2 != null) f.Rotor2.transform.Rotate(0f, 0f, -1500f * Time.deltaTime);
+                if (f.Tail != null) f.Tail.transform.Rotate(0f, 0f, -2200f * Time.deltaTime);
                 if (f.Audio != null && haveCam)
                 {
                     float d = Vector2.Distance(new Vector2(cam.x, cam.y), (Vector2)f.ShadowGo.transform.position);

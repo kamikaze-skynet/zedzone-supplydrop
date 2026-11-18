@@ -41,6 +41,7 @@ The host runs everything: the timer, the crates, the loot and the zombies. Those
 | Zombies.DelaySeconds | 6 | seconds after landing before the horde comes |
 | Zombies.BeaconSeconds | 60 | how long the beacon keeps calling zombies |
 | Helicopter.Enabled / Volume / Speed / Size | true / 0.6 / 14 / 1 | the flyover |
+| Helicopter.UH1Y | true | draw the UH-1Y (Blender model); false = simple code-drawn helicopter |
 | UI.MapMarker / MarkerMinutes | true / 10 | mark the drop as your waypoint on the map |
 | UI.GuideArrow / ArrowMinutes | true / 4 | the arrow next to your character |
 | Keys.CallDropKey / AllowCallKey | End / true | call a drop now (host) |
