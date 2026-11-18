@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SupplyDrop
 {
-    // The UH-1Y renders from the Helicopter mod's Blender model (zedzone-helicopter/blender/UH1Y.blend),
+    // The UH-1Y renders from the UH-1Y Blender model, embedded in this DLL (zedzone-helicopter/blender/UH1Y.blend),
     // embedded in this DLL. Top-down, nose pointing right; the main rotor mast is at the image centre.
     // Same scale as the Helicopter mod (166 px per world unit, drawn at 1.3x) so both look alike.
     // If loading fails the code-drawn helicopter in Art.cs is used instead.

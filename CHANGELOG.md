@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.2.0 (2026-11-18)
-- The helicopter is now the UH-1Y from the Helicopter mod's Blender model (top-down render with spinning, blurred main rotor and a matching shadow). `Helicopter.UH1Y = false` brings back the simple code-drawn one.
+- The helicopter is now the UH-1Y from the UH-1Y Blender model, built into this mod so no other mod is needed (top-down render with spinning, blurred main rotor and a matching shadow). `Helicopter.UH1Y = false` brings back the simple code-drawn one.
 
 ## 1.1.0 (2026-11-16)
 - Random loot: each crate gets 5-9 random items from every item that can spawn in the world (always a gun with a magazine and ammo, then a mix of ammo, gear, food, materials and more). `Loot.Mode = Tables` brings back the game's supply-crate tables.
