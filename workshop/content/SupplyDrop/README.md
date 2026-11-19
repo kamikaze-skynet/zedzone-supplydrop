@@ -2,6 +2,11 @@
 
 A ZED ZONE mod (BepInEx IL2CPP). Every so often a supply helicopter flies over and parachutes a crate of good loot near one of the players. The crate's beacon draws a zombie horde to it, so grab it fast.
 
+## Requires
+
+- ZED ZONE (Windows, Steam)
+- [ZED ZONE Code Mod Loader](https://steamcommunity.com/sharedfiles/filedetails/?id=3834614258) - run its install.cmd once, then start the game through Steam.
+
 ## What happens
 
 1. **Warning.** A message pops up: *"Supply helicopter inbound! Crate drops to the north-east (64 m) in 45 s. It's marked on your map."* The drop zone is a random spot 40-90 units from a random player. It's set as your waypoint, so it shows on the map, the minimap and as an arrow with the distance at the edge of the screen (teammates see it too). A yellow arrow next to your character also points at it. Your old waypoint comes back once you reach the crate.
@@ -41,6 +46,7 @@ The host runs everything: the timer, the crates, the loot and the zombies. Those
 | Zombies.DelaySeconds | 6 | seconds after landing before the horde comes |
 | Zombies.BeaconSeconds | 60 | how long the beacon keeps calling zombies |
 | Helicopter.Enabled / Volume / Speed / Size | true / 0.6 / 14 / 1 | the flyover |
+| Helicopter.UH1Y | true | draw the UH-1Y (Blender model); false = simple code-drawn helicopter |
 | UI.MapMarker / MarkerMinutes | true / 10 | mark the drop as your waypoint on the map |
 | UI.GuideArrow / ArrowMinutes | true / 4 | the arrow next to your character |
 | Keys.CallDropKey / AllowCallKey | End / true | call a drop now (host) |
