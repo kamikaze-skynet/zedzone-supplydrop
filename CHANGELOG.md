@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2026-11-21)
+- Fewer drops: the first drop now comes after 30 minutes, then every 1 to 2 hours of play (was 8 minutes, then about every 20). Configs still on the old defaults are moved to the new ones; changing the timing in Mod Menu now also reschedules the drop that's waiting.
+- Guns in crates are limited to pistols, revolvers, SMGs and shotguns by default (`Loot.GunTypes`). The log lists which gun counts as which kind.
+- Guns and melee weapons from other mods are no longer put in crates (`Loot.ModdedWeapons`); other mods' non-weapon items still can be (`Loot.ModdedItems`).
+- The supply pack (green satchel) can now be disassembled, like a backpack (`Loot.PackDisassemble`).
+
 ## 1.2.0 (2026-11-18)
 - The helicopter is now the UH-1Y from the UH-1Y Blender model, built into this mod so no other mod is needed (top-down render with spinning, blurred main rotor and a matching shadow). `Helicopter.UH1Y = false` brings back the simple code-drawn one.
 

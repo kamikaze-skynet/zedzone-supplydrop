@@ -11,11 +11,13 @@ namespace SupplyDrop
     public class Plugin : BasePlugin
     {
         public const string Guid = "girthy_mods.zedzone.supplydrop";
-        public const string Version = "1.2.0";
+        public const string Version = "1.3.0";
 
         public override void Load()
         {
             Settings.Bind(Config);
+            Settings.Migrate();
+            Drops.WatchSettings();
             SLog.Verbose = Settings.VerboseLog.Value;
             SLog.Open(Log, Version);
             SLog.Info(Settings.Describe());
@@ -45,6 +47,8 @@ namespace SupplyDrop
 
         void Update()
         {
+            try { Pack.Tick(); }
+            catch (Exception e) { SLog.Error("Supply pack fix failed", e); Pack.GiveUp(); }
             try { Drops.Tick(); }
             catch (Exception e) { SLog.Error("Drop update failed", e); Drops.Abort(); }
             try { Net.Tick(); }

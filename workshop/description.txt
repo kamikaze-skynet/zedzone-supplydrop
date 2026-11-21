@@ -10,8 +10,8 @@ Every so often a supply helicopter flies over and parachutes a crate of good loo
 [*][b]Horde:[/b] a few seconds after landing the beacon goes off and zombies converge on it. The horde grows with the day count.
 [/list]
 
-Random loot: 5-9 random items per crate from everything that can spawn in the world, always including a gun with ammo. (Or switch to the game's supply-crate tables in the config.)
-First drop 8 minutes after loading in, then about every 20 minutes. Host can press End to call one right away.
+Random loot: 5-9 random items per crate from everything that can spawn in the world, always including a gun with ammo (pistols, SMGs and shotguns by default; no weapons from other mods unless you allow them). (Or switch to the game's supply-crate tables in the config.)
+First drop 30 minutes after loading in, then every 1 to 2 hours of play (all adjustable in Mod Menu). Host can press End to call one right away.
 
 [h2]Co-op[/h2]
 The host runs the drops; crates, loot and zombies are the game's own and sync to everyone. Guests with the mod also see the helicopter, message and arrow.

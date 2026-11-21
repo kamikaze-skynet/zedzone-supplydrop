@@ -74,6 +74,18 @@ namespace SupplyDrop
             if (a.AlarmStarted || (a.LandedAt >= 0f && !Settings.Zombies.Value)) { _active = null; ScheduleNext(); }
         }
 
+        // a timing change (e.g. from Mod Menu) applies to the drop that's waiting, not just the one after
+        internal static void WatchSettings()
+        {
+            Settings.IntervalMinutes.SettingChanged += (s, e) => Rescheduled();
+            Settings.IntervalRandomMinutes.SettingChanged += (s, e) => Rescheduled();
+        }
+
+        static void Rescheduled()
+        {
+            if (_active == null && _next > 0f && InGameController.instance != null) ScheduleNext();
+        }
+
         static void ScheduleNext()
         {
             float r = Settings.IntervalRandomMinutes.Value;

@@ -13,7 +13,9 @@ namespace SupplyDrop
         internal static ConfigEntry<float> DropDistanceMin, DropDistanceMax;
         // loot
         internal static ConfigEntry<int> LootLevel, MaxCrates;
-        internal static ConfigEntry<bool> CratePerPlayer;
+        internal static ConfigEntry<bool> CratePerPlayer, ModdedWeapons, ModdedItems, PackDisassemble;
+        internal static ConfigEntry<string> GunTypes;
+        internal static ConfigEntry<int> ConfigVersion;
         internal static ConfigEntry<string> LootMode;
         internal static ConfigEntry<int> ItemsMin, ItemsMax;
         internal static ConfigEntry<float> LootQuality;
@@ -35,9 +37,9 @@ namespace SupplyDrop
             Enabled = c.Bind("General", "Enabled", true, "Turn supply drops on or off. The host (or single player) runs the drops; guests with the mod see the helicopter, the message and the guide arrow.");
             VerboseLog = c.Bind("General", "VerboseLog", false, "Log extra detail in BepInEx\\SupplyDrop.log.");
 
-            FirstDropMinutes = c.Bind("Timing", "FirstDropMinutes", 8f, R("Minutes after loading into the world before the first drop.", 0.5f, 240f));
-            IntervalMinutes = c.Bind("Timing", "IntervalMinutes", 20f, R("Average minutes between drops.", 1f, 240f));
-            IntervalRandomMinutes = c.Bind("Timing", "IntervalRandomMinutes", 5f, R("Each wait is IntervalMinutes plus or minus up to this many minutes.", 0f, 120f));
+            FirstDropMinutes = c.Bind("Timing", "FirstDropMinutes", 30f, R("Minutes of play after loading into the world before the first drop.", 0.5f, 480f));
+            IntervalMinutes = c.Bind("Timing", "IntervalMinutes", 90f, R("Average minutes of play between drops (default 90 = about one drop every 1-2 hours with the random spread below).", 1f, 480f));
+            IntervalRandomMinutes = c.Bind("Timing", "IntervalRandomMinutes", 30f, R("Each wait is IntervalMinutes plus or minus up to this many minutes.", 0f, 240f));
             WarningSeconds = c.Bind("Timing", "WarningSeconds", 45f, R("Seconds between the 'helicopter inbound' message and the crate dropping.", 10f, 300f));
 
             DropDistanceMin = c.Bind("Location", "MinDistance", 40f, R("The crate lands at a random spot at least this far (world units) from a random player. It's marked on the map.", 4f, 400f));
@@ -48,6 +50,10 @@ namespace SupplyDrop
             ItemsMax = c.Bind("Loot", "ItemsMax", 9, RI("Random mode: most items in a crate.", 1, 30));
             LootLevel = c.Bind("Loot", "LootLevel", 6, RI("How good the loot is (1-15). Uses the game's own supply-crate loot tables; higher means better weapons and more of them.", 1, 15));
             LootQuality = c.Bind("Loot", "AffixIntensity", 0.5f, R("How strong random weapon/armour bonuses on crate loot are (0 = none, 1 = strongest).", 0f, 1f));
+            GunTypes = c.Bind("Loot", "GunTypes", "Pistol, Revolver, SMG, Shotgun", "Random mode: which kinds of gun a crate can hold, comma separated. Choices: Pistol, Revolver, SMG, Shotgun, Rifle, Bow, Crossbow, Energy, Liquid, Flare. Leave empty for no guns. The log lists which gun counts as what.");
+            ModdedWeapons = c.Bind("Loot", "ModdedWeapons", false, "Random mode: allow guns and melee weapons added by other mods (off = only the game's own weapons).");
+            ModdedItems = c.Bind("Loot", "ModdedItems", true, "Random mode: allow other non-weapon items added by other mods (ammo, gear, food...).");
+            PackDisassemble = c.Bind("Loot", "PackDisassemble", true, "Let the supply pack itself (green satchel) be disassembled like a backpack once it's empty.");
             CratePerPlayer = c.Bind("Loot", "CratePerPlayer", true, "Drop one crate per player in the session (so nobody has to fight over it).");
             MaxCrates = c.Bind("Loot", "MaxCrates", 4, RI("Most crates in one drop.", 1, 8));
 
@@ -67,15 +73,26 @@ namespace SupplyDrop
             ArrowMinutes = c.Bind("UI", "ArrowMinutes", 4f, R("How long the arrow stays (it also goes away when you reach the crate).", 0.5f, 30f));
             MapMarker = c.Bind("UI", "MapMarker", true, "Put the drop on your map as a waypoint (map pin, minimap, edge-of-screen arrow with distance; teammates see it too). Your old waypoint comes back after you reach the crate.");
             MarkerMinutes = c.Bind("UI", "MarkerMinutes", 10f, R("How long the map marker stays if nobody reaches the crate.", 1f, 60f));
+            ConfigVersion = c.Bind("General", "ConfigVersion", 0, "Used by the mod to update old default values. Leave it alone.");
             ShareWithGuests = c.Bind("General", "ShareWithGuests", true, "Host: send the drop to guests who have the mod (message, helicopter, arrow).");
 
             AllowCallKey = c.Bind("Keys", "AllowCallKey", true, "Host: let CallDropKey call a drop right now (handy for testing).");
             CallDropKey = c.Bind("Keys", "CallDropKey", KeyCode.End, "Host: key that calls a supply drop right now. Default End: F5 is the game's quick save, F7/F8 are DogShare's give/take-back dog keys (F9/F10 its kennel test build), Insert is Spawn Menu.");
         }
 
+        // 1.3.0 raised the timing defaults; move configs still on the old defaults to the new ones
+        internal static void Migrate()
+        {
+            if (ConfigVersion.Value >= 2) return;
+            if (Mathf.Approximately(IntervalMinutes.Value, 20f)) IntervalMinutes.Value = 90f;
+            if (Mathf.Approximately(IntervalRandomMinutes.Value, 5f)) IntervalRandomMinutes.Value = 30f;
+            if (Mathf.Approximately(FirstDropMinutes.Value, 8f)) FirstDropMinutes.Value = 30f;
+            ConfigVersion.Value = 2;
+        }
+
         internal static string Describe() =>
             $"Config: Enabled={Enabled.Value} first={FirstDropMinutes.Value}m every={IntervalMinutes.Value}±{IntervalRandomMinutes.Value}m warning={WarningSeconds.Value}s " +
-            $"distance={DropDistanceMin.Value}-{DropDistanceMax.Value} loot={LootMode.Value} items={ItemsMin.Value}-{ItemsMax.Value} level={LootLevel.Value} affix={LootQuality.Value} perPlayer={CratePerPlayer.Value} max={MaxCrates.Value} " +
+            $"distance={DropDistanceMin.Value}-{DropDistanceMax.Value} loot={LootMode.Value} guns=[{GunTypes.Value}] moddedWeapons={ModdedWeapons.Value} moddedItems={ModdedItems.Value} packDisassemble={PackDisassemble.Value} items={ItemsMin.Value}-{ItemsMax.Value} level={LootLevel.Value} affix={LootQuality.Value} perPlayer={CratePerPlayer.Value} max={MaxCrates.Value} " +
             $"zombies={Zombies.Value} x{ZombieCount.Value} scale={ScaleZombiesByDay.Value} delay={ZombieDelaySeconds.Value}s beacon={BeaconSeconds.Value}s " +
             $"heli={Helicopter.Value} vol={HeliVolume.Value} speed={HeliSpeed.Value} arrow={GuideArrow.Value} map={MapMarker.Value} key={(AllowCallKey.Value ? CallDropKey.Value.ToString() : "off")}";
     }

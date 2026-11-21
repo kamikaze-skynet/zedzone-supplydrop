@@ -12,6 +12,7 @@ namespace SupplyDrop
     internal static class RandomLoot
     {
         static readonly Dictionary<int, List<ItemAttr>> _byCat = new Dictionary<int, List<ItemAttr>>();
+        static readonly Dictionary<int, string> _gunKind = new Dictionary<int, string>();
         static IntPtr _builtFor;
         static readonly System.Random _rng = new System.Random();
 
@@ -40,6 +41,8 @@ namespace SupplyDrop
             if (im == null || im.itemList == null || im.itemList.Count == 0) return false;
             if (im.Pointer == _builtFor && _byCat.Count > 0) return true;
             _byCat.Clear();
+            _gunKind.Clear();
+            ClassifyGuns(im.itemList);
             int n = 0;
             foreach (var a in im.itemList)
             {
@@ -60,14 +63,106 @@ namespace SupplyDrop
             return n > 0;
         }
 
+        static readonly string[] SmgWords = { "smg", "submachine", "sub-machine", "sub machine", "uzi", "mp5", "mp7", "mp40", "mp-40", "ump", "p90", "vector", "mac-10", "mac10", "mac 10", "thompson", "tommy", "skorpion", "bizon", "tec-9", "tec9", "sten", "ppsh", "pp-19", "pp19", "kriss" };
+
+        // Gun kinds come from the game's weapon type; "Rifle" is split into SMG when the gun fires
+        // pistol ammo or its name says so.
+        static void ClassifyGuns(Il2CppSystem.Collections.Generic.List<ItemAttr> all)
+        {
+            var guns = new List<ItemAttr_RangedWeapon>();
+            var pistolAmmo = new HashSet<int>();
+            foreach (var a in all)
+            {
+                try
+                {
+                    if (a == null || a.itemType != ItemType.RangedWeapon) continue;
+                    var g = a.TryCast<ItemAttr_RangedWeapon>();
+                    if (g == null) continue;
+                    guns.Add(g);
+                    if ((g.weaponType == RangedWeaponType.Pistol || g.weaponType == RangedWeaponType.Revolver) && g.ammoId > 0) pistolAmmo.Add(g.ammoId);
+                }
+                catch { }
+            }
+            var byKind = new SortedDictionary<string, List<string>>();
+            foreach (var g in guns)
+            {
+                string kind;
+                try
+                {
+                    if (g.isFlareGun) kind = "Flare";
+                    else switch (g.weaponType)
+                    {
+                        case RangedWeaponType.Pistol: kind = "Pistol"; break;
+                        case RangedWeaponType.Revolver: kind = "Revolver"; break;
+                        case RangedWeaponType.ShotGun: kind = "Shotgun"; break;
+                        case RangedWeaponType.Bow: kind = "Bow"; break;
+                        case RangedWeaponType.Crossbow: kind = "Crossbow"; break;
+                        case RangedWeaponType.EnergyWeapon: case RangedWeaponType.EnergyChargeWeapon: kind = "Energy"; break;
+                        case RangedWeaponType.LiquidWeapon: kind = "Liquid"; break;
+                        default:
+                            string name = (g.ItemName_EN ?? "").ToLowerInvariant();
+                            bool smg = pistolAmmo.Contains(g.ammoId);
+                            foreach (var w in SmgWords) if (name.Contains(w)) { smg = true; break; }
+                            kind = smg ? "SMG" : "Rifle";
+                            break;
+                    }
+                }
+                catch { kind = "Rifle"; }
+                _gunKind[g.itemId] = kind;
+                if (!byKind.TryGetValue(kind, out var l)) byKind[kind] = l = new List<string>();
+                l.Add($"{SafeName(g)}{(IsModded(g) ? " (mod)" : "")}");
+            }
+            foreach (var kv in byKind) SLog.Info($"Guns counted as {kv.Key}: {string.Join(", ", kv.Value)}");
+        }
+
+        static string SafeName(ItemAttr a) { try { return a.ItemName_EN ?? a.itemId.ToString(); } catch { return a.itemId.ToString(); } }
+
+        static bool IsModded(ItemAttr a)
+        {
+            try { return !string.IsNullOrEmpty(a.modGuid); } catch { return false; }
+        }
+
+        static HashSet<string> AllowedGunKinds()
+        {
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var part in (Settings.GunTypes.Value ?? "").Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var k = part.Trim();
+                if (k.Equals("Shotguns", StringComparison.OrdinalIgnoreCase)) k = "Shotgun";
+                if (k.Equals("Pistols", StringComparison.OrdinalIgnoreCase)) k = "Pistol";
+                if (k.Equals("SMGs", StringComparison.OrdinalIgnoreCase)) k = "SMG";
+                set.Add(k);
+            }
+            return set;
+        }
+
+        // Is this item allowed in a crate with the current settings? (read every crate, so Mod Menu changes apply at once)
+        static bool Allowed(ItemAttr a, int cat, HashSet<string> gunKinds)
+        {
+            bool modded = IsModded(a);
+            if (cat == Gun || cat == Melee && a.itemType == ItemType.MeleeWeapon)
+            {
+                if (modded && !Settings.ModdedWeapons.Value) return false;
+            }
+            else if (modded && !Settings.ModdedItems.Value) return false;
+            if (cat == Gun)
+            {
+                if (!_gunKind.TryGetValue(a.itemId, out var kind)) kind = "Rifle";
+                return gunKinds.Contains(kind);
+            }
+            return true;
+        }
+
+        static Dictionary<int, List<ItemAttr>> _pools = new Dictionary<int, List<ItemAttr>>();
+
         static int PickCat()
         {
             int total = 0;
-            for (int i = 0; i < Weights.Length; i++) if (_byCat.ContainsKey(i)) total += Weights[i];
+            for (int i = 0; i < Weights.Length; i++) if (_pools.ContainsKey(i)) total += Weights[i];
             int r = _rng.Next(Math.Max(1, total));
             for (int i = 0; i < Weights.Length; i++)
             {
-                if (!_byCat.ContainsKey(i)) continue;
+                if (!_pools.ContainsKey(i)) continue;
                 if (r < Weights[i]) return i;
                 r -= Weights[i];
             }
@@ -80,14 +175,23 @@ namespace SupplyDrop
             int min = Math.Max(1, Settings.ItemsMin.Value);
             int max = Math.Max(min, Settings.ItemsMax.Value);
             int count = _rng.Next(min, max + 1);
+            var kinds = AllowedGunKinds();
+            _pools = new Dictionary<int, List<ItemAttr>>();
+            foreach (var kv in _byCat)
+            {
+                var l = new List<ItemAttr>();
+                foreach (var a in kv.Value) { try { if (Allowed(a, kv.Key, kinds)) l.Add(a); } catch { } }
+                if (l.Count > 0) _pools[kv.Key] = l;
+            }
+            if (_pools.Count == 0) { SLog.Warn("No items are allowed by the Loot settings; the crate will use the game's tables."); return null; }
             var list = new ItemList();
             var names = new List<string>();
             var used = new HashSet<int>();
             for (int i = 0; i < count; i++)
             {
                 // first slot is always a gun so every crate is worth the run
-                int cat = i == 0 && _byCat.ContainsKey(Gun) ? Gun : PickCat();
-                var pool = _byCat[cat];
+                int cat = i == 0 && _pools.ContainsKey(Gun) ? Gun : PickCat();
+                if (!_pools.TryGetValue(cat, out var pool)) continue;
                 ItemAttr a = null;
                 for (int t = 0; t < 6 && a == null; t++)
                 {
